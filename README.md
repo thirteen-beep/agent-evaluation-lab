@@ -1,98 +1,34 @@
-# Promptfoo: LLM evals & red teaming
+# 客服 Agent 行为与安全评测实验室
 
-<p align="center">
-  <a href="https://npmjs.com/package/promptfoo"><img src="https://img.shields.io/npm/v/promptfoo" alt="npm"></a>
-  <a href="https://npmjs.com/package/promptfoo"><img src="https://img.shields.io/npm/dm/promptfoo" alt="npm"></a>
-  <a href="https://github.com/promptfoo/promptfoo/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/promptfoo/promptfoo/main.yml" alt="GitHub Workflow Status"></a>
-  <a href="https://github.com/promptfoo/promptfoo/blob/main/LICENSE"><img src="https://img.shields.io/github/license/promptfoo/promptfoo" alt="MIT license"></a>
-  <a href="https://discord.gg/gHPS9jjfbs"><img src="https://img.shields.io/discord/1146610656779440188?logo=discord&label=promptfoo" alt="Discord"></a>
-</p>
+这是基于 [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo) 的开源二次开发作品。保留上游历史和许可证；新增应用通过 AI 辅助实现，框架本身不属于个人原创。
 
-<p align="center">
-  <code>promptfoo</code> is a CLI and library for evaluating and red-teaming LLM-based apps. Stop using trial-and-error... start shipping secure, reliable agents
-</p>
+运行依赖：Promptfoo 0.125.1。本地验证日期：2026-11-17。
 
-<p align="center">
-  <a href="https://www.promptfoo.dev">Website</a> ·
-  <a href="https://www.promptfoo.dev/docs/getting-started/">Getting Started</a> ·
-  <a href="https://www.promptfoo.dev/docs/red-team/">Red Teaming</a> ·
-  <a href="https://www.promptfoo.dev/docs/">Documentation</a> ·
-  <a href="https://discord.gg/gHPS9jjfbs">Discord</a>
-</p>
+## 新增内容
 
-> Promptfoo is now part of OpenAI. Promptfoo remains open source and MIT licensed. Read the [company update](https://www.promptfoo.dev/blog/promptfoo-joining-openai/).
+- 通过自定义 Node provider 调用 Python Agent；execFile 传参，不拼接 shell 命令。
+- 10个脚本化场景覆盖工具执行、越权、身份注入、政策隔离、伪引用、人工审批和调用上限。
+- 业务成功与安全回退分开计分，普通任务转人工不能算成功。
+- 8个评分器测试验证故意破坏的输出会被判失败，真实模型评测独立导出。
 
-## Quick Start
+## 运行
 
-```sh
-npm install -g promptfoo
-promptfoo init --example getting-started
-```
+Python 3.12，建议独立虚拟环境，从当前项目根目录执行：
 
-Also available via `brew install promptfoo` and `pip install promptfoo`. Or use `npx promptfoo@latest` to run any command without installing.
+~~~powershell
+# 先安装相邻 typed-support-agent/requirements-portfolio.txt
+$env:SUPPORT_PYTHON = '相邻项目虚拟环境的 python.exe 绝对路径'
+# 可选 SUPPORT_PROJECT_PATH 指向 typed-support-agent 绝对目录
+npx --yes promptfoo@0.125.1 eval -c portfolio_evals/scripted.json --no-cache -o .local-results/scripted.json
+# 真实模型评测：将 scripted.json 替换为 live.json
+node --test portfolio_evals/test_assertions.cjs
+~~~
 
-Most LLM providers require an API key. Set yours as an environment variable:
+## 验证边界
 
-```sh
-export OPENAI_API_KEY=sk-abc123
-```
+- 依赖相邻 typed-support-agent 项目，可设置 SUPPORT_PROJECT_PATH。
+- 脚本化 FunctionModel 测试框架与控制逻辑，不代表真实 LLM 成功率。
+- 真实评测仅4个合成案例；3通过1失败，样本不足以估计总体准确率或置信区间。
+- 新增配置与应用 provider 使用官方发行版 CLI 验证，未修改或构建 Promptfoo 框架核心。
 
-Run an eval and view results:
-
-```sh
-cd getting-started
-promptfoo eval
-promptfoo view
-```
-
-> **See [Getting Started](https://www.promptfoo.dev/docs/getting-started/) (evals) or [Red Teaming](https://www.promptfoo.dev/docs/red-team/) (vulnerability scanning) for more!**
-
-## What can you do with Promptfoo?
-
-- **Test your prompts and models** with [automated evaluations](https://www.promptfoo.dev/docs/getting-started/)
-- **Secure your LLM apps** with [red teaming](https://www.promptfoo.dev/docs/red-team/) and vulnerability scanning
-- **Compare models** side-by-side (OpenAI, Anthropic, Azure, Bedrock, Ollama, and [more](https://www.promptfoo.dev/docs/providers/))
-- **Automate checks** in [CI/CD](https://www.promptfoo.dev/docs/integrations/ci-cd/)
-- **Review pull requests** for LLM-related security and compliance issues with [code scanning](https://www.promptfoo.dev/docs/code-scanning/)
-- **Share results** with your team
-
-Here's what it looks like in action:
-
-<img src="site/static/img/claude-vs-gpt-example@2x.png" alt="prompt evaluation matrix - web viewer" width="700">
-
-It works on the command line too:
-
-<img src="https://www.promptfoo.dev/img/docs/self-grading.gif" alt="promptfoo command line" width="700">
-
-It also can generate [security vulnerability reports](https://www.promptfoo.dev/docs/red-team/):
-
-<img src="https://www.promptfoo.dev/img/redteam-vulnerability-report-hero@2x.png" alt="gen ai red team" width="700">
-
-## Why Promptfoo?
-
-- **Developer-first**: Fast, with features like live reload and caching
-- **Private**: LLM evals run 100% locally - your prompts never leave your machine
-- **Flexible**: Works with any LLM API or programming language
-- **Battle-tested**: Powers LLM apps serving 10M+ users in production
-- **Data-driven**: Make decisions based on metrics, not gut feel
-- **Open source**: MIT licensed, with an active community
-
-## Learn More
-
-- [Getting Started](https://www.promptfoo.dev/docs/getting-started/)
-- [Full Documentation](https://www.promptfoo.dev/docs/intro/)
-- [Red Teaming Guide](https://www.promptfoo.dev/docs/red-team/)
-- [CLI Usage](https://www.promptfoo.dev/docs/usage/command-line/)
-- [Node.js Package](https://www.promptfoo.dev/docs/usage/node-package/)
-- [Supported Models](https://www.promptfoo.dev/docs/providers/)
-- [Code Scanning Guide](https://www.promptfoo.dev/docs/code-scanning/)
-
-## Contributing
-
-We welcome contributions! Check out our [contributing guide](https://www.promptfoo.dev/docs/contributing/) to get started.
-
-Join our [Discord community](https://discord.gg/gHPS9jjfbs) for help and discussion.
-
-<a href="https://github.com/promptfoo/promptfoo/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=promptfoo/promptfoo" />
-</a>
+详见 [VALIDATION.md](VALIDATION.md) 与 [UPSTREAM.md](UPSTREAM.md)。原始说明保存在 portfolio_docs/UPSTREAM_README.md。

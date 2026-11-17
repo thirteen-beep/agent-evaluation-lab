@@ -1,0 +1,22 @@
+{
+  "scripted": {
+    "cases": 10,
+    "passed": 10,
+    "failed": 0,
+    "provider_errors": 0,
+    "median_latency_ms": 1740.5,
+    "min_latency_ms": 1564,
+    "max_latency_ms": 3937,
+    "interpretation": "scripted framework checks, not LLM accuracy"
+  },
+  "live": {
+    "cases": 4,
+    "passed": 3,
+    "failed": 1,
+    "provider_errors": 1,
+    "median_latency_ms": 37733.5,
+    "min_latency_ms": 32572,
+    "max_latency_ms": 50357,
+    "interpretation": "4 synthetic cases only; no population accuracy or confidence interval claim"
+  }
+}
